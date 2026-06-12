@@ -30,7 +30,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 // 토큰에서 유저 고유 ID(providerId) 추출
                 String providerId = jwtTokenProvider.getProviderIdFromToken(token);
                 
-                // 스프링 시큐리티 컨텍스트(서버의 메모리)에 이 사람은 인증된 유저라고 도장 쾅 찍어줌!
+                // 스프링 시큐리티 컨텍스트(서버의 메모리)에 이 사람은 인증된 유저라고 도장 찍어줌
                 UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                         providerId, null, Collections.emptyList()
                 );

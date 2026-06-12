@@ -31,7 +31,7 @@ public class User extends BaseTimeEntity {
     // GitHub 연동 후 코드를 푸시하기 위한 접근 토큰
     private String githubToken;
 
-    // 코드가 자동으로 푸시될 레포지토리 이름 (예: resolve-algorithm-notes)
+    // 코드가 자동으로 푸시될 레포지토리 이름
     private String githubRepoName;
 
     @Enumerated(EnumType.STRING)
