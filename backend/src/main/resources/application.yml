@@ -1,0 +1,23 @@
+spring:
+  application:
+    name: resolve-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/resolve_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: root
+    password: chihappykid12 # TODO: 본인 로컬 MySQL 비밀번호로 변경해주세요!
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update # 개발용: 엔티티 수정 시 DB 테이블 자동 변경
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+
+springdoc:
+  swagger-ui:
+    path: /swagger-ui.html
+    groups-order: DESC
+    operationsSorter: method
+    disable-swagger-default-url: true
+    display-request-duration: true
