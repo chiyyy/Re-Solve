@@ -1,16 +1,47 @@
-import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { useAppStore } from "../store/appStore";
 import { Button } from "../components/ui/Button";
 
 export function LoginPage() {
   const login = useAppStore((state) => state.login);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  // 1. 주소창에서 token 낚아채기
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      // 2. 낚아챈 토큰을 브라우저 창고(localStorage)에 안전하게 보관
+      localStorage.setItem("resolve_token", token);
+      
+      // 3. 백엔드에 내 깃허브 닉네임 물어보기!
+      fetch("http://localhost:8080/api/users/me", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+        .then(res => {
+          if (!res.ok) throw new Error("유저 정보를 불러올 수 없습니다.");
+          return res.json();
+        })
+        .then(data => {
+          // 4. 백엔드가 응답한 진짜 깃허브 닉네임을 상태에 저장!
+          login(data.nickname); 
+          
+          // 5. 대시보드로 이동하며 주소창 청소
+          navigate("/", { replace: true });
+        })
+        .catch(err => {
+          console.error("로그인 에러:", err);
+          alert("로그인 중 문제가 발생했습니다.");
+        });
+    }
+  }, [searchParams, navigate, login]);
 
   const handleGitHub = () => {
-    // TODO: 백엔드 OAuth URL로 리다이렉트 구현 예정
-    // 일단 임시로 가짜 로그인 처리
-    login("github_user@example.com");
-    navigate("/");
+    // 백엔드의 OAuth2 로그인 주소로 진짜 리다이렉트 시킴!
+    window.location.href = "http://localhost:8080/oauth2/authorization/github";
   };
 
   return (
