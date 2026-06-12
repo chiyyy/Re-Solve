@@ -1,16 +1,32 @@
-import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router";
 import { useAppStore } from "../store/appStore";
 import { Button } from "../components/ui/Button";
+import { userApi } from "../api/user";
 
 export function LoginPage() {
   const login = useAppStore((state) => state.login);
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+
+  useEffect(() => {
+    const token = searchParams.get("token");
+    if (token) {
+      localStorage.setItem("resolve_token", token);
+      
+      userApi.getMe()
+        .then(data => {
+          login(data); 
+          navigate("/", { replace: true });
+        })
+        .catch(err => {
+          console.error(err);
+        });
+    }
+  }, [searchParams, navigate, login]);
 
   const handleGitHub = () => {
-    // TODO: 백엔드 OAuth URL로 리다이렉트 구현 예정
-    // 일단 임시로 가짜 로그인 처리
-    login("github_user@example.com");
-    navigate("/");
+    window.location.href = "http://localhost:8080/oauth2/authorization/github";
   };
 
   return (

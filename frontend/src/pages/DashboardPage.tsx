@@ -53,7 +53,7 @@ export function DashboardPage() {
           Re:Solve
         </span>
         <div className="flex items-center gap-4">
-          <span className="text-gray-500 text-sm">{currentUser}</span>
+          <span className="text-gray-500 text-sm">{currentUser?.nickname}</span>
           <Button variant="ghost" size="sm" onClick={handleLogout}>
             <LogOut size={16} />
             로그아웃

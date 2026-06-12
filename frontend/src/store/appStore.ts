@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import type { UserResponse } from "../api/user";
 
 export type Difficulty = "Easy" | "Medium" | "Hard";
 export type Platform = "BOJ" | "LeetCode" | "Programmers" | "Codeforces";
@@ -24,10 +25,10 @@ export interface Problem {
 
 interface AppState {
   isLoggedIn: boolean;
-  currentUser: string | null;
+  currentUser: UserResponse | null;
   problems: Problem[];
   
-  login: (email: string) => void;
+  login: (user: UserResponse) => void;
   logout: () => void;
   
   addProblem: (p: Omit<Problem, "id" | "createdAt">) => string;
@@ -76,7 +77,7 @@ export const useAppStore = create<AppState>()(
       currentUser: null,
       problems: SEED_PROBLEMS,
 
-      login: (email: string) => set({ isLoggedIn: true, currentUser: email }),
+      login: (user: UserResponse) => set({ isLoggedIn: true, currentUser: user }),
       
       logout: () => set({ isLoggedIn: false, currentUser: null }),
 
