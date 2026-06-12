@@ -1,6 +1,8 @@
 spring:
   application:
     name: resolve-backend
+  profiles:
+    include: oauth
   datasource:
     url: jdbc:mysql://localhost:3306/resolve_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
     username: root
@@ -21,3 +23,9 @@ springdoc:
     operationsSorter: method
     disable-swagger-default-url: true
     display-request-duration: true
+
+jwt:
+  # JWT 서명에 사용할 Base64 인코딩된 비밀키 (실무에선 환경변수로 뺌)
+  secret: c2VjcmV0LWtleS1mb3ItcmVzb2x2ZS1wcm9qZWN0LW11c3QtYmUtb25nLWVub3VnaA==
+  # 토큰 만료 시간 (86400000ms = 24시간)
+  expiration: 86400000
