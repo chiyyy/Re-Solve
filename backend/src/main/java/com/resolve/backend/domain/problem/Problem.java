@@ -62,6 +62,18 @@ public class Problem extends BaseTimeEntity {
         this.note = note;
         this.isPushed = false;
     }
+
+    // 정보 수정 메서드
+    public void update(String title, String url, Platform platform, Difficulty difficulty, String algorithmType, ProblemStatus status, String code, String note) {
+        this.title = title;
+        this.url = url;
+        this.platform = platform;
+        this.difficulty = difficulty;
+        this.algorithmType = algorithmType;
+        this.status = status;
+        this.code = code;
+        this.note = note;
+    }
     
     // 푸시 성공 시 상태를 업데이트하는 메서드
     public void markAsPushed(String commitUrl) {
