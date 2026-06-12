@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
 import { Search, Plus, LogOut } from "lucide-react";
 import { useAppStore, type Difficulty, type AlgorithmType, type Status } from "../store/appStore";
+import { problemApi } from "../api/problem";
 import { StatCard } from "../components/StatCard";
 import { ProblemRow } from "../components/ProblemRow";
 import { Button } from "../components/ui/Button";
@@ -20,12 +21,19 @@ export function DashboardPage() {
   const problems = useAppStore((state) => state.problems);
   const logout = useAppStore((state) => state.logout);
   const currentUser = useAppStore((state) => state.currentUser);
+  const setProblems = useAppStore((state) => state.setProblems);
   
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
   const [difficulty, setDifficulty] = useState<Difficulty | "All">("All");
   const [algorithm, setAlgorithm] = useState<AlgorithmType | "All">("All");
   const [status, setStatus] = useState<Status | "All">("All");
+
+  useEffect(() => {
+    problemApi.getAll().then(data => {
+      setProblems(data);
+    }).catch(console.error);
+  }, [setProblems]);
 
   const filtered = problems.filter((p) => {
     const matchSearch =

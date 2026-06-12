@@ -112,13 +112,29 @@ public class ProblemService {
         }
         
         problemRepository.delete(problem);
+
+        // 깃허브 동기화 삭제
+        if (problem.isPushed()) {
+            String repoName = user.getGithubRepoName();
+            if (repoName == null || repoName.isEmpty()) {
+                repoName = "resolve-algorithm-records";
+            }
+            String safeTitle = problem.getTitle().replaceAll("\\s+", "_");
+            String path = problem.getPlatform().name() + "/" + problem.getDifficulty().name() + "/" + safeTitle + ".md";
+            
+            try {
+                githubSyncService.deleteFromGithub(user.getGithubToken(), user.getNickname(), repoName, path, "Delete solved problem: " + problem.getTitle());
+            } catch (Exception e) {
+                log.error("GitHub 파일 삭제 실패", e);
+            }
+        }
     }
 
     // 마크다운 생성 및 푸시 공통 메서드
     private void pushProblemToGithub(User user, Problem problem, String commitMessage) {
         String repoName = user.getGithubRepoName();
         if (repoName == null || repoName.isEmpty()) {
-            repoName = "algorithm-practice"; // 유저가 레포 이름을 설정 안 했으면 임시로 사용
+            repoName = "resolve-algorithm-records"; // 유저가 레포 이름을 설정 안 했으면 임시로 사용
         }
         
         // 백준/Easy/두_수의_합.md 형식으로 저장

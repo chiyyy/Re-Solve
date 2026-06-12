@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from "react-router";
 import { useAppStore } from "../store/appStore";
 import { Button } from "../components/ui/Button";
 import { userApi } from "../api/user";
+import { authApi } from "../api/auth";
 
 export function LoginPage() {
   const login = useAppStore((state) => state.login);
@@ -26,7 +27,7 @@ export function LoginPage() {
   }, [searchParams, navigate, login]);
 
   const handleGitHub = () => {
-    window.location.href = "http://localhost:8080/oauth2/authorization/github";
+    authApi.loginWithGithub();
   };
 
   return (

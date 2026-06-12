@@ -22,10 +22,10 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
         OAuth2User oAuth2User = (OAuth2User) authentication.getPrincipal();
         String providerId = oAuth2User.getAttribute("id").toString();
 
-        // 성공적으로 깃허브 로그인 완료되면 우리만의 JWT 토큰 발급
+        // JWT 토큰 발급
         String token = jwtTokenProvider.createToken(providerId);
 
-        // 프론트엔드 주소로 리다이렉트 (URL 쿼리 파라미터로 토큰을 얹어서 보냄)
+        // 프론트엔드로 리다이렉트 및 토큰 전달
         String targetUrl = UriComponentsBuilder.fromUriString("http://localhost:5173/login")
                 .queryParam("token", token)
                 .build().toUriString();

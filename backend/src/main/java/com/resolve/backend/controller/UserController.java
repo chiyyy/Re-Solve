@@ -17,14 +17,12 @@ public class UserController {
 
     private final UserRepository userRepository;
 
-    // 내 정보 가져오기 (문지기를 통과한 유저만 호출 가능)
     @GetMapping("/me")
-    public ResponseEntity<UserResponseDto> getMyInfo(@AuthenticationPrincipal String providerId) {
-        if (providerId == null) {
-            return ResponseEntity.status(401).build(); // 권한 없음
+    public ResponseEntity<UserResponseDto> getCurrentUser(@AuthenticationPrincipal String providerId) {
+        if (providerId == null || providerId.equals("anonymousUser")) {
+            return ResponseEntity.status(401).build();
         }
         
-        // 도장에 찍힌 고유 ID로 DB에서 유저 진짜 정보를 찾아옴
         User user = userRepository.findByProviderAndProviderId("GITHUB", providerId)
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
                 

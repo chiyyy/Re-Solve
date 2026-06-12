@@ -31,6 +31,7 @@ interface AppState {
   login: (user: UserResponse) => void;
   logout: () => void;
   
+  setProblems: (problems: Problem[]) => void;
   addProblem: (p: Omit<Problem, "id" | "createdAt">) => string;
   updateProblem: (id: string, p: Partial<Problem>) => void;
   deleteProblem: (id: string) => void;
@@ -75,11 +76,13 @@ export const useAppStore = create<AppState>()(
     (set, get) => ({
       isLoggedIn: false,
       currentUser: null,
-      problems: SEED_PROBLEMS,
+      problems: [],
 
       login: (user: UserResponse) => set({ isLoggedIn: true, currentUser: user }),
       
       logout: () => set({ isLoggedIn: false, currentUser: null }),
+
+      setProblems: (problems) => set({ problems }),
 
       addProblem: (p) => {
         const id = Date.now().toString();
