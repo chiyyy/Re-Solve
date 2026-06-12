@@ -5,6 +5,7 @@ import { useAppStore, type Difficulty, type Platform, type AlgorithmType, type S
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
+import { problemApi } from "../api/problem";
 
 const PLATFORMS: Platform[] = ["BOJ", "LeetCode", "Programmers", "Codeforces"];
 const DIFFICULTIES: Difficulty[] = ["Easy", "Medium", "Hard"];
@@ -34,6 +35,7 @@ export function EditorPage() {
     note: "",
   });
   const [saved, setSaved] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
 
   useEffect(() => {
     if (isEdit && id) {
@@ -56,16 +58,32 @@ export function EditorPage() {
   const set = (key: string, val: string) =>
     setForm((prev) => ({ ...prev, [key]: val }));
 
-  const handleSave = () => {
-    if (!form.title.trim()) return;
-    if (isEdit && id) {
-      updateProblem(id, form);
-      setSaved(true);
-      setTimeout(() => navigate(`/problems/${id}`), 600);
-    } else {
-      const newId = addProblem(form);
-      setSaved(true);
-      setTimeout(() => navigate(`/problems/${newId}`), 600);
+  const handleSave = async () => {
+    if (!form.title.trim() || isSaving) return;
+    setIsSaving(true);
+    
+    try {
+      const payload = {
+        ...form,
+        platform: form.platform.toUpperCase(),
+        difficulty: form.difficulty.toUpperCase(),
+        status: form.status.toUpperCase()
+      };
+      
+      if (isEdit && id) {
+        await problemApi.update(id, payload);
+        updateProblem(id, form); // 로컬 스토어 즉각 갱신
+        setSaved(true);
+        setTimeout(() => navigate(`/problems/${id}`), 600);
+      } else {
+        await problemApi.create(payload);
+        setSaved(true);
+        setTimeout(() => navigate("/"), 600);
+      }
+    } catch (err) {
+      console.error(err);
+      alert("문제 저장 및 깃허브 푸시에 실패했습니다.");
+      setIsSaving(false);
     }
   };
 
@@ -84,11 +102,11 @@ export function EditorPage() {
         </div>
         <Button
           onClick={handleSave}
-          disabled={!form.title.trim()}
+          disabled={!form.title.trim() || isSaving}
           variant={saved ? "success" : "primary"}
         >
           <Save size={16} />
-          {saved ? "저장됨" : "저장"}
+          {isSaving ? "저장 중..." : saved ? "저장됨" : "저장"}
         </Button>
       </header>
 

@@ -20,16 +20,16 @@ public class ProblemController {
     // 문제 등록
     @PostMapping
     public ResponseEntity<Long> createProblem(
-            @RequestParam(defaultValue = "1") Long userId, // TODO: 인증 구현 후 SecurityContext에서 가져오기
+            @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId,
             @Valid @RequestBody ProblemCreateRequestDto requestDto) {
-        return ResponseEntity.ok(problemService.createProblem(userId, requestDto));
+        return ResponseEntity.ok(problemService.createProblem(providerId, requestDto));
     }
 
     // 특정 유저의 문제 목록 조회
     @GetMapping
     public ResponseEntity<List<ProblemResponseDto>> getProblems(
-            @RequestParam(defaultValue = "1") Long userId) { // TODO: 인증 구현 후 SecurityContext에서 가져오기
-        return ResponseEntity.ok(problemService.getProblemsByUserId(userId));
+            @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId) {
+        return ResponseEntity.ok(problemService.getProblemsByProviderId(providerId));
     }
 
     // 문제 상세 조회
@@ -41,15 +41,18 @@ public class ProblemController {
     // 문제 수정
     @PutMapping("/{id}")
     public ResponseEntity<Long> updateProblem(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId,
             @PathVariable Long id,
             @Valid @RequestBody ProblemUpdateRequestDto requestDto) {
-        return ResponseEntity.ok(problemService.updateProblem(id, requestDto));
+        return ResponseEntity.ok(problemService.updateProblem(providerId, id, requestDto));
     }
 
     // 문제 삭제
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
-        problemService.deleteProblem(id);
+    public ResponseEntity<Void> deleteProblem(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId,
+            @PathVariable Long id) {
+        problemService.deleteProblem(providerId, id);
         return ResponseEntity.ok().build();
     }
 }

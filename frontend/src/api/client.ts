@@ -1,4 +1,8 @@
-const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080/api";
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+if (!BASE_URL) {
+  throw new Error("VITE_API_BASE_URL is missing in .env");
+}
 
 export const apiClient = async (endpoint: string, options: RequestInit = {}) => {
   const token = localStorage.getItem("resolve_token");

@@ -23,7 +23,6 @@ public class JwtTokenProvider {
         this.expiration = expiration;
     }
 
-    // JWT 토큰 생성
     public String createToken(String providerId) {
         Date now = new Date();
         Date validity = new Date(now.getTime() + expiration);
@@ -36,7 +35,6 @@ public class JwtTokenProvider {
                 .compact();
     }
 
-    // JWT 토큰에서 유저 고유 ID(providerId) 추출
     public String getProviderIdFromToken(String token) {
         Claims claims = Jwts.parser()
                 .verifyWith(key)

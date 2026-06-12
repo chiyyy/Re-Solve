@@ -6,6 +6,7 @@ import { DifficultyBadge } from "../components/Badge";
 import { MarkdownViewer } from "../components/MarkdownViewer";
 import { Button } from "../components/ui/Button";
 import { DeleteConfirmModal } from "../components/DeleteConfirmModal";
+import { problemApi } from "../api/problem";
 
 export function DetailPage() {
   const { id } = useParams();
@@ -30,15 +31,42 @@ export function DetailPage() {
     );
   }
 
-  const toggleStatus = () => {
-    updateProblem(problem.id, {
-      status: problem.status === "Solved" ? "Review" : "Solved",
-    });
+  const toggleStatus = async () => {
+    if (!problem) return;
+    const newStatus = problem.status === "Solved" ? "Review" : "Solved";
+    
+    // UI 즉각 반영
+    updateProblem(problem.id, { status: newStatus });
+    
+    try {
+      const payload = {
+        title: problem.title,
+        url: problem.url,
+        code: problem.code,
+        note: problem.note,
+        platform: problem.platform.toUpperCase(),
+        difficulty: problem.difficulty.toUpperCase(),
+        algorithmType: problem.algorithmType,
+        status: newStatus.toUpperCase()
+      };
+      await problemApi.update(problem.id, payload);
+    } catch (e) {
+      alert("상태 변경에 실패했습니다.");
+      // 롤백
+      updateProblem(problem.id, { status: problem.status });
+    }
   };
 
-  const handleDelete = () => {
-    deleteProblem(problem.id);
-    navigate("/");
+  const handleDelete = async () => {
+    if (!problem) return;
+    try {
+      await problemApi.delete(problem.id);
+      deleteProblem(problem.id);
+      navigate("/");
+    } catch (e) {
+      alert("삭제에 실패했습니다.");
+      setShowDeleteConfirm(false);
+    }
   };
 
   const formattedDate = new Date(problem.createdAt).toLocaleDateString("ko-KR", {
