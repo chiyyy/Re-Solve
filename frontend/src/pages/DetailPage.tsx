@@ -7,6 +7,7 @@ import { MarkdownViewer } from "../components/MarkdownViewer";
 import { Button } from "../components/ui/Button";
 import { DeleteConfirmModal } from "../components/DeleteConfirmModal";
 import { problemApi } from "../api/problem";
+import Editor from "@monaco-editor/react";
 
 export function DetailPage() {
   const { id } = useParams();
@@ -116,7 +117,7 @@ export function DetailPage() {
               </a>
             </div>
 
-            <div className="flex-shrink-0">
+            <div className="shrink-0">
               <p className="text-gray-400 mb-2 text-right text-xs font-medium uppercase tracking-wider">풀이 상태</p>
               <div className="flex border border-gray-100 rounded-lg overflow-hidden">
                 <button
@@ -147,19 +148,35 @@ export function DetailPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div className="flex flex-col border border-gray-100 rounded-xl overflow-hidden bg-gray-900">
-            <div className="bg-gray-800 px-5 py-3 flex items-center gap-3 border-b border-gray-700">
+          <div className="flex flex-col border border-gray-100 rounded-xl overflow-hidden bg-gray-900 shadow-sm">
+            <div className="bg-gray-800 px-5 py-3 flex items-center justify-between border-b border-gray-700">
               <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
+                <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                <div className="w-3 h-3 rounded-full bg-green-500/80" />
               </div>
-              <span className="text-gray-400 font-mono text-xs">내 코드</span>
+              <span className="text-gray-400 font-mono text-xs font-semibold tracking-wider">Submitted Code</span>
             </div>
-            <div className="p-5 overflow-auto custom-scrollbar" style={{ minHeight: "400px", maxHeight: "600px" }}>
-              <pre className="text-gray-300 font-mono whitespace-pre-wrap break-words text-sm leading-relaxed">
-                {problem.code || <span className="text-gray-500">코드가 없습니다.</span>}
-              </pre>
+            <div className="flex-1 w-full relative" style={{ minHeight: "400px", maxHeight: "600px" }}>
+              <Editor
+                height="100%"
+                defaultLanguage="java"
+                theme="vs-dark"
+                value={problem.code || "// 작성된 코드가 없습니다."}
+                options={{
+                  readOnly: true,
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+                  wordWrap: "on",
+                  lineNumbersMinChars: 3,
+                  scrollBeyondLastLine: false,
+                  padding: { top: 16, bottom: 16 },
+                  renderLineHighlight: "none",
+                  hideCursorInOverviewRuler: true
+                }}
+                loading={<div className="flex items-center justify-center h-full text-gray-500 text-sm">코드 로딩 중...</div>}
+              />
             </div>
           </div>
 

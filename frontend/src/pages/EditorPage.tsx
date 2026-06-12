@@ -6,6 +6,7 @@ import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
 import { problemApi } from "../api/problem";
+import Editor from "@monaco-editor/react";
 
 const PLATFORMS: Platform[] = ["BOJ", "LeetCode", "Programmers", "Codeforces"];
 const DIFFICULTIES: Difficulty[] = ["Easy", "Medium", "Hard"];
@@ -161,35 +162,37 @@ export function EditorPage() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-[600px]">
-          <div className="flex flex-col border border-gray-100 rounded-xl overflow-hidden bg-gray-900">
-            <div className="bg-gray-800 px-5 py-3 flex items-center gap-3 border-b border-gray-700">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 h-150">
+          <div className="flex flex-col border border-gray-100 rounded-xl overflow-hidden bg-gray-900 shadow-sm">
+            <div className="bg-gray-800 px-5 py-3 flex items-center justify-between border-b border-gray-700">
               <div className="flex gap-2">
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
-                <div className="w-3 h-3 rounded-full bg-gray-600" />
+                <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                <div className="w-3 h-3 rounded-full bg-green-500/80" />
               </div>
-              <span className="text-gray-400 font-mono text-xs">내 코드 작성</span>
+              <span className="text-gray-400 font-mono text-xs font-semibold tracking-wider">VS Code Editor</span>
             </div>
-            <textarea
-              value={form.code}
-              onChange={(e) => set("code", e.target.value)}
-              placeholder="# 여기에 코드를 붙여넣으세요..."
-              className="flex-1 bg-gray-900 text-gray-300 p-5 resize-none outline-none font-mono placeholder-gray-600 w-full text-sm leading-relaxed custom-scrollbar"
-              spellCheck={false}
-              onKeyDown={(e) => {
-                if (e.key === "Tab") {
-                  e.preventDefault();
-                  const start = e.currentTarget.selectionStart;
-                  const end = e.currentTarget.selectionEnd;
-                  const val = form.code;
-                  set("code", val.substring(0, start) + "    " + val.substring(end));
-                  setTimeout(() => {
-                    e.currentTarget.selectionStart = e.currentTarget.selectionEnd = start + 4;
-                  }, 0);
-                }
-              }}
-            />
+            <div className="flex-1 w-full relative">
+              <Editor
+                height="100%"
+                defaultLanguage="java"
+                theme="vs-dark"
+                value={form.code}
+                onChange={(val) => set("code", val || "")}
+                options={{
+                  minimap: { enabled: false },
+                  fontSize: 14,
+                  fontFamily: "'JetBrains Mono', 'Fira Code', Consolas, monospace",
+                  wordWrap: "on",
+                  lineNumbersMinChars: 3,
+                  scrollBeyondLastLine: false,
+                  padding: { top: 16, bottom: 16 },
+                  smoothScrolling: true,
+                  cursorBlinking: "smooth"
+                }}
+                loading={<div className="flex items-center justify-center h-full text-gray-500 text-sm">VS Code 엔진 부팅 중... 🚀</div>}
+              />
+            </div>
           </div>
 
           <div className="flex flex-col border border-gray-100 rounded-xl overflow-hidden bg-white">
