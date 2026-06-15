@@ -31,11 +31,11 @@ export const problemApi = {
       status: mapStatus(item.status),
     }));
   },
-  create: (data: Partial<Problem>): Promise<number> => apiClient("/problems", {
+  create: (data: Record<string, unknown>): Promise<number> => apiClient("/problems", {
     method: "POST",
     body: JSON.stringify(data)
   }),
-  update: (id: string, data: Partial<Problem>): Promise<number> => apiClient(`/problems/${id}`, {
+  update: (id: string, data: Record<string, unknown>): Promise<number> => apiClient(`/problems/${id}`, {
     method: "PUT",
     body: JSON.stringify(data)
   }),
