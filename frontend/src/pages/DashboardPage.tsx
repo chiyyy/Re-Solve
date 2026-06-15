@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { Search, Plus, LogOut } from "lucide-react";
 import { useAppStore, type Difficulty, type AlgorithmType, type Status } from "../store/appStore";
 import { problemApi } from "../api/problem";
+import CalendarHeatmap from "react-calendar-heatmap";
 import { StatCard } from "../components/StatCard";
 import { ProblemRow } from "../components/ProblemRow";
 import { Button } from "../components/ui/Button";
@@ -32,8 +33,14 @@ export function DashboardPage() {
   useEffect(() => {
     problemApi.getAll().then(data => {
       setProblems(data);
-    }).catch(console.error);
-  }, [setProblems]);
+    }).catch(err => {
+      console.error(err);
+      if (err instanceof Error && err.message.includes("401")) {
+        logout();
+        navigate("/login");
+      }
+    });
+  }, [setProblems, logout, navigate]);
 
   const filtered = problems.filter((p) => {
     const matchSearch =
@@ -53,6 +60,24 @@ export function DashboardPage() {
     logout();
     navigate("/login");
   };
+
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const startDate = new Date(currentYear, 0, 1);
+  const endDate = new Date(currentYear, 11, 31);
+
+  const getHeatmapData = () => {
+    const counts: Record<string, number> = {};
+    problems.forEach(p => {
+      if (p.createdAt) {
+        const dateStr = p.createdAt.split('T')[0];
+        counts[dateStr] = (counts[dateStr] || 0) + 1;
+      }
+    });
+    return Object.entries(counts).map(([date, count]) => ({ date, count }));
+  };
+
+  const heatmapData = getHeatmapData();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -74,6 +99,36 @@ export function DashboardPage() {
           <StatCard label="전체 문제" value={problems.length} />
           <StatCard label="풀었음" value={solvedCount} labelClassName="text-green-600" />
           <StatCard label="재복습 필요" value={reviewCount} labelClassName="text-amber-600" />
+        </div>
+
+        <div className="bg-white border border-gray-100 rounded-lg p-5 mb-6 shadow-sm">
+          <h2 className="text-gray-700 font-semibold text-sm tracking-wide mb-4 flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500"></span>
+            1년 간의 학습 기록 (Heatmap)
+          </h2>
+          <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
+            <div className="min-w-[700px]">
+              <CalendarHeatmap
+                startDate={startDate}
+                endDate={endDate}
+                values={heatmapData}
+                classForValue={(value) => {
+                  if (!value || value.count === 0) {
+                    return 'color-empty';
+                  }
+                  if (value.count === 1) return 'color-scale-1';
+                  if (value.count === 2) return 'color-scale-2';
+                  if (value.count === 3) return 'color-scale-3';
+                  return 'color-scale-4';
+                }}
+                showWeekdayLabels={true}
+                titleForValue={(value) => {
+                  if (!value || value.count === 0) return '문제 없음';
+                  return `${value.date}: ${value.count}문제 해결`;
+                }}
+              />
+            </div>
+          </div>
         </div>
 
         <div className="bg-white border border-gray-100 rounded-lg mb-0 overflow-hidden">
