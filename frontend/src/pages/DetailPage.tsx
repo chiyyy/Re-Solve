@@ -51,7 +51,7 @@ export function DetailPage() {
         status: newStatus.toUpperCase()
       };
       await problemApi.update(problem.id, payload);
-    } catch (e) {
+    } catch {
       alert("상태 변경에 실패했습니다.");
       // 롤백
       updateProblem(problem.id, { status: problem.status });
@@ -64,7 +64,7 @@ export function DetailPage() {
       await problemApi.delete(problem.id);
       deleteProblem(problem.id);
       navigate("/");
-    } catch (e) {
+    } catch {
       alert("삭제에 실패했습니다.");
       setShowDeleteConfirm(false);
     }

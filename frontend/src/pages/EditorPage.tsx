@@ -20,7 +20,7 @@ const STATUSES: Status[] = ["Solved", "Review"];
 export function EditorPage() {
   const { id } = useParams();
   const isEdit = Boolean(id);
-  const addProblem = useAppStore((state) => state.addProblem);
+
   const updateProblem = useAppStore((state) => state.updateProblem);
   const getProblem = useAppStore((state) => state.getProblem);
   const navigate = useNavigate();

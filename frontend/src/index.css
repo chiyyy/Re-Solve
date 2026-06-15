@@ -13,3 +13,35 @@ body {
   font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
   background-color: #f9fafb;
 }
+
+/* react-calendar-heatmap Tailwind overrides */
+.react-calendar-heatmap text {
+  @apply text-[10px] fill-gray-400;
+}
+.react-calendar-heatmap .react-calendar-heatmap-small-text {
+  @apply text-[10px];
+}
+.react-calendar-heatmap rect {
+  @apply rx-1 ry-1; /* rounded corners */
+}
+.react-calendar-heatmap rect:hover {
+  @apply stroke-gray-900 stroke-1 cursor-pointer;
+}
+.react-calendar-heatmap .color-empty {
+  @apply fill-gray-100;
+}
+.react-calendar-heatmap .color-scale-1 {
+  @apply fill-green-200;
+}
+.react-calendar-heatmap .color-scale-2 {
+  @apply fill-green-400;
+}
+.react-calendar-heatmap .color-scale-3 {
+  @apply fill-green-600;
+}
+.react-calendar-heatmap .color-scale-4 {
+  @apply fill-green-800;
+}
+.react-calendar-heatmap {
+  @apply w-full h-auto;
+}
