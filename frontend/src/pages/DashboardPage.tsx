@@ -33,8 +33,14 @@ export function DashboardPage() {
   useEffect(() => {
     problemApi.getAll().then(data => {
       setProblems(data);
-    }).catch(console.error);
-  }, [setProblems]);
+    }).catch(err => {
+      console.error(err);
+      if (err instanceof Error && err.message.includes("401")) {
+        logout();
+        navigate("/login");
+      }
+    });
+  }, [setProblems, logout, navigate]);
 
   const filtered = problems.filter((p) => {
     const matchSearch =
@@ -56,7 +62,9 @@ export function DashboardPage() {
   };
 
   const today = new Date();
-  const startDate = new Date(today.getFullYear() - 1, today.getMonth(), today.getDate());
+  const currentYear = today.getFullYear();
+  const startDate = new Date(currentYear, 0, 1);
+  const endDate = new Date(currentYear, 11, 31);
 
   const getHeatmapData = () => {
     const counts: Record<string, number> = {};
@@ -102,7 +110,7 @@ export function DashboardPage() {
             <div className="min-w-[700px]">
               <CalendarHeatmap
                 startDate={startDate}
-                endDate={today}
+                endDate={endDate}
                 values={heatmapData}
                 classForValue={(value) => {
                   if (!value || value.count === 0) {

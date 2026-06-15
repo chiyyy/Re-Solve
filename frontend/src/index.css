@@ -16,32 +16,37 @@ body {
 
 /* react-calendar-heatmap Tailwind overrides */
 .react-calendar-heatmap text {
-  @apply text-[10px] fill-gray-400;
+  font-size: 10px;
+  fill: #9ca3af;
 }
 .react-calendar-heatmap .react-calendar-heatmap-small-text {
-  @apply text-[10px];
+  font-size: 5px;
 }
 .react-calendar-heatmap rect {
-  @apply rx-1 ry-1; /* rounded corners */
+  rx: 2;
+  ry: 2;
 }
 .react-calendar-heatmap rect:hover {
-  @apply stroke-gray-900 stroke-1 cursor-pointer;
+  stroke: #111827;
+  stroke-width: 1px;
+  cursor: pointer;
 }
 .react-calendar-heatmap .color-empty {
-  @apply fill-gray-100;
+  fill: #f3f4f6;
 }
 .react-calendar-heatmap .color-scale-1 {
-  @apply fill-green-200;
+  fill: #bbf7d0;
 }
 .react-calendar-heatmap .color-scale-2 {
-  @apply fill-green-400;
+  fill: #4ade80;
 }
 .react-calendar-heatmap .color-scale-3 {
-  @apply fill-green-600;
+  fill: #16a34a;
 }
 .react-calendar-heatmap .color-scale-4 {
-  @apply fill-green-800;
+  fill: #166534;
 }
 .react-calendar-heatmap {
-  @apply w-full h-auto;
+  width: 100%;
+  height: auto;
 }
