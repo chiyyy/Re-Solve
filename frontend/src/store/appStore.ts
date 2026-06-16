@@ -21,6 +21,12 @@ export interface Problem {
   code: string;
   note: string;
   createdAt: string;
+  updatedAt: string;
+  
+  // 에빙하우스 복습 필드
+  reviewStep: number;
+  nextReviewDate: string | null;
+  isTodayReview: boolean;
 }
 
 interface AppState {
