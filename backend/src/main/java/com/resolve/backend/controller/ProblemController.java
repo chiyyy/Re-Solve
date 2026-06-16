@@ -56,20 +56,11 @@ public class ProblemController {
         return ResponseEntity.ok().build();
     }
 
-    // 복습 완료 처리
     @PostMapping("/{id}/review")
     public ResponseEntity<Void> completeReview(
             @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId,
             @PathVariable Long id) {
         problemService.completeReview(providerId, id);
-        return ResponseEntity.ok().build();
-    }
-
-    // 모의 데이터 주입
-    @PostMapping("/mock")
-    public ResponseEntity<Void> insertMockData(
-            @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId) {
-        problemService.insertMockData(providerId);
         return ResponseEntity.ok().build();
     }
 }

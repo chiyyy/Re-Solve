@@ -14,7 +14,6 @@ body {
   background-color: #f9fafb;
 }
 
-/* react-calendar-heatmap Tailwind overrides */
 .react-calendar-heatmap text {
   font-size: 10px;
   fill: #9ca3af;

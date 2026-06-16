@@ -44,8 +44,5 @@ export const problemApi = {
   }),
   completeReview: (id: string): Promise<void> => apiClient(`/problems/${id}/review`, {
     method: "POST"
-  }),
-  insertMockData: (): Promise<void> => apiClient(`/problems/mock`, {
-    method: "POST"
   })
 };

@@ -3,12 +3,13 @@ import { useNavigate } from "react-router";
 import { Search, Plus, LogOut } from "lucide-react";
 import { useAppStore, type Difficulty, type AlgorithmType, type Status } from "../store/appStore";
 import { problemApi } from "../api/problem";
-import CalendarHeatmap from "react-calendar-heatmap";
 import { StatCard } from "../components/StatCard";
 import { ProblemRow } from "../components/ProblemRow";
 import { Button } from "../components/ui/Button";
 import { Input } from "../components/ui/Input";
 import { Select } from "../components/ui/Select";
+import { TodayReviewSection } from "../components/TodayReviewSection";
+import { HeatmapSection } from "../components/HeatmapSection";
 
 const ALL_DIFFICULTIES: Array<Difficulty | "All"> = ["All", "Easy", "Medium", "Hard"];
 const ALL_ALGORITHMS: Array<AlgorithmType | "All"> = [
@@ -61,37 +62,14 @@ export function DashboardPage() {
     navigate("/login");
   };
 
-  const today = new Date();
-  const currentYear = today.getFullYear();
-  const startDate = new Date(currentYear, 0, 1);
-  const endDate = new Date(currentYear, 11, 31);
-
-  const todayReviews = problems.filter((p) => p.isTodayReview);
-
-  const handleCompleteReview = async (problemId: string) => {
+  const fetchProblems = async () => {
     try {
-      await problemApi.completeReview(problemId);
-      // Fetch problems again or update local state
       const updated = await problemApi.getAll();
       setProblems(updated);
     } catch (err) {
       console.error(err);
-      alert("복습 완료 처리에 실패했습니다.");
     }
   };
-
-  const getHeatmapData = () => {
-    const counts: Record<string, number> = {};
-    problems.forEach(p => {
-      if (p.createdAt) {
-        const dateStr = p.createdAt.split('T')[0];
-        counts[dateStr] = (counts[dateStr] || 0) + 1;
-      }
-    });
-    return Object.entries(counts).map(([date, count]) => ({ date, count }));
-  };
-
-  const heatmapData = getHeatmapData();
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -115,79 +93,9 @@ export function DashboardPage() {
           <StatCard label="재복습 필요" value={reviewCount} labelClassName="text-amber-600" />
         </div>
 
-        {todayReviews.length > 0 && (
-          <div className="mb-8">
-            <h2 className="text-gray-800 font-semibold text-base tracking-wide mb-3 flex items-center gap-2">
-              <span>오늘의 복습</span>
-              <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full font-medium">
-                {todayReviews.length}
-              </span>
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              {todayReviews.map((problem) => (
-                <div 
-                  key={problem.id} 
-                  className="group bg-white border border-gray-200 rounded-lg p-4 flex flex-col justify-between shadow-sm cursor-pointer hover:border-gray-300 hover:shadow transition-all"
-                  onClick={() => navigate(`/problems/${problem.id}`)}
-                >
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-[11px] font-medium bg-slate-100 text-slate-600 px-2 py-0.5 rounded">
-                        {problem.reviewStep === 0 ? "1일차" : problem.reviewStep === 1 ? "3일차" : "7일차"} 복습
-                      </span>
-                      <span className="text-gray-400 text-xs font-medium">{problem.platform}</span>
-                    </div>
-                    <h3 className="font-medium text-gray-800 group-hover:text-blue-600 transition-colors line-clamp-1">
-                      {problem.title}
-                    </h3>
-                  </div>
-                  <div className="mt-4 flex justify-end">
-                    <Button 
-                      variant="secondary" 
-                      size="sm" 
-                      onClick={(e) => {
-                        e.stopPropagation(); // 카드 클릭(상세보기) 이벤트가 실행되지 않도록 막음
-                        handleCompleteReview(problem.id);
-                      }}
-                    >
-                      복습 완료
-                    </Button>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
+        <TodayReviewSection problems={problems} onReviewComplete={fetchProblems} />
 
-        <div className="bg-white border border-gray-100 rounded-lg p-5 mb-6 shadow-sm">
-          <h2 className="text-gray-700 font-semibold text-sm tracking-wide mb-4 flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500"></span>
-            1년 간의 학습 기록
-          </h2>
-          <div className="w-full overflow-x-auto pb-2 custom-scrollbar">
-            <div className="min-w-175">
-              <CalendarHeatmap
-                startDate={startDate}
-                endDate={endDate}
-                values={heatmapData}
-                classForValue={(value) => {
-                  if (!value || value.count === 0) {
-                    return 'color-empty';
-                  }
-                  if (value.count === 1) return 'color-scale-1';
-                  if (value.count === 2) return 'color-scale-2';
-                  if (value.count === 3) return 'color-scale-3';
-                  return 'color-scale-4';
-                }}
-                showWeekdayLabels={true}
-                titleForValue={(value) => {
-                  if (!value || value.count === 0) return '문제 없음';
-                  return `${value.date}: ${value.count}문제 해결`;
-                }}
-              />
-            </div>
-          </div>
-        </div>
+        <HeatmapSection problems={problems} />
 
         <div className="bg-white border border-gray-100 rounded-lg mb-0 overflow-hidden">
           <div className="px-5 py-4 border-b border-gray-50 flex flex-wrap gap-3 items-center bg-white">
