@@ -9,4 +9,7 @@ public interface ProblemRepository extends JpaRepository<Problem, Long> {
     
     // 유저의 문제를 최신순(내림차순)으로 조회
     List<Problem> findAllByUserIdOrderByIdDesc(Long userId);
+    
+    // 복습이 필요한 문제 찾기 (status = REVIEW, nextReviewDate <= 주어진 날짜, isTodayReview = false)
+    List<Problem> findByStatusAndNextReviewDateLessThanEqualAndIsTodayReviewFalse(ProblemStatus status, java.time.LocalDate date);
 }
