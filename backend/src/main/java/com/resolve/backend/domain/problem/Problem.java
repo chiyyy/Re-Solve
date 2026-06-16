@@ -49,6 +49,11 @@ public class Problem extends BaseTimeEntity {
     // 실제 깃허브에 올라간 커밋의 링크
     private String commitUrl;
 
+    // 에빙하우스 복습 관련 필드
+    private Integer reviewStep;
+    private java.time.LocalDate nextReviewDate;
+    private boolean isTodayReview;
+
     @Builder
     public Problem(User user, String title, String url, Platform platform, Difficulty difficulty, String algorithmType, ProblemStatus status, String code, String note) {
         this.user = user;
@@ -61,6 +66,16 @@ public class Problem extends BaseTimeEntity {
         this.code = code;
         this.note = note;
         this.isPushed = false;
+        
+        // 복습 상태로 등록되면 1일 뒤 첫 복습 설정
+        if (status == ProblemStatus.REVIEW) {
+            this.reviewStep = 0;
+            this.nextReviewDate = java.time.LocalDate.now().plusDays(1);
+        } else {
+            this.reviewStep = 0;
+            this.nextReviewDate = null;
+        }
+        this.isTodayReview = false;
     }
 
     // 정보 수정 메서드
@@ -70,11 +85,48 @@ public class Problem extends BaseTimeEntity {
         this.platform = platform;
         this.difficulty = difficulty;
         this.algorithmType = algorithmType;
-        this.status = status;
         this.code = code;
         this.note = note;
+
+        // 상태가 변경되었을 때 에빙하우스 로직 초기화
+        if (this.status != status) {
+            this.status = status;
+            if (status == ProblemStatus.REVIEW) {
+                this.reviewStep = 0;
+                this.nextReviewDate = java.time.LocalDate.now().plusDays(1);
+                this.isTodayReview = false;
+            } else {
+                this.reviewStep = 0;
+                this.nextReviewDate = null;
+                this.isTodayReview = false;
+            }
+        }
     }
     
+    // 복습 스케줄러가 오늘 복습할 문제로 지정
+    public void activateTodayReview() {
+        this.isTodayReview = true;
+    }
+
+    // 복습 완료 처리 (1일 -> 3일 -> 7일 -> 완료)
+    public void completeReview() {
+        if (!this.isTodayReview || this.status != ProblemStatus.REVIEW) return;
+
+        this.isTodayReview = false;
+        if (this.reviewStep == null) this.reviewStep = 0;
+        this.reviewStep++;
+
+        if (this.reviewStep == 1) {
+            this.nextReviewDate = java.time.LocalDate.now().plusDays(3);
+        } else if (this.reviewStep == 2) {
+            this.nextReviewDate = java.time.LocalDate.now().plusDays(7);
+        } else {
+            // 3회차 복습(7일 뒤)까지 완료하면 완벽히 익힌 것으로 간주하여 상태 변경
+            this.nextReviewDate = null;
+            this.status = ProblemStatus.SOLVED;
+        }
+    }
+
     // 푸시 성공 시 상태를 업데이트하는 메서드
     public void markAsPushed(String commitUrl) {
         this.isPushed = true;

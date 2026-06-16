@@ -42,4 +42,7 @@ export const problemApi = {
   delete: (id: string): Promise<void> => apiClient(`/problems/${id}`, {
     method: "DELETE"
   }),
+  completeReview: (id: string): Promise<void> => apiClient(`/problems/${id}/review`, {
+    method: "POST"
+  })
 };

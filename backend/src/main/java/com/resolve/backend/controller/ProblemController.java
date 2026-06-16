@@ -55,4 +55,12 @@ public class ProblemController {
         problemService.deleteProblem(providerId, id);
         return ResponseEntity.ok().build();
     }
+
+    @PostMapping("/{id}/review")
+    public ResponseEntity<Void> completeReview(
+            @org.springframework.security.core.annotation.AuthenticationPrincipal String providerId,
+            @PathVariable Long id) {
+        problemService.completeReview(providerId, id);
+        return ResponseEntity.ok().build();
+    }
 }

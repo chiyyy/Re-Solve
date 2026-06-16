@@ -23,6 +23,13 @@ public class ProblemResponseDto {
     private String commitUrl;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
+    
+    // 에빙하우스 복습 필드
+    private Integer reviewStep;
+    private java.time.LocalDate nextReviewDate;
+    
+    @com.fasterxml.jackson.annotation.JsonProperty("isTodayReview")
+    private boolean isTodayReview;
 
     public ProblemResponseDto(Problem entity) {
         this.id = entity.getId();
@@ -38,5 +45,8 @@ public class ProblemResponseDto {
         this.commitUrl = entity.getCommitUrl();
         this.createdAt = entity.getCreatedAt();
         this.updatedAt = entity.getUpdatedAt();
+        this.reviewStep = entity.getReviewStep();
+        this.nextReviewDate = entity.getNextReviewDate();
+        this.isTodayReview = entity.isTodayReview();
     }
 }

@@ -30,7 +30,7 @@ public class ProblemService {
                 .orElseThrow(() -> new IllegalArgumentException("사용자를 찾을 수 없습니다."));
     }
 
-    // 특정 유저의 전체 문제 목록 조회
+    // 전체 문제 목록 조회
     public List<ProblemResponseDto> getProblemsByProviderId(String providerId) {
         User user = getUserByProviderId(providerId);
         return problemRepository.findAllByUserIdOrderByIdDesc(user.getId())
@@ -64,8 +64,6 @@ public class ProblemService {
                 .build();
                 
         problemRepository.save(problem);
-        
-        // 깃허브 푸시 로직 호출
         pushProblemToGithub(user, problem, "Add solved problem: " + problem.getTitle());
         
         return problem.getId();
@@ -78,7 +76,6 @@ public class ProblemService {
         Problem problem = problemRepository.findById(problemId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 문제를 찾을 수 없습니다. ID=" + problemId));
                 
-        // 권한 체크: 자기 문제만 수정 가능
         if (!problem.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException("수정 권한이 없습니다.");
         }
@@ -94,7 +91,6 @@ public class ProblemService {
             requestDto.getNote()
         );
         
-        // 깃허브 업데이트 로직 호출
         pushProblemToGithub(user, problem, "Update solved problem: " + problem.getTitle());
         
         return problemId;
@@ -113,7 +109,6 @@ public class ProblemService {
         
         problemRepository.delete(problem);
 
-        // 깃허브 동기화 삭제
         if (problem.isPushed()) {
             String repoName = user.getGithubRepoName();
             if (repoName == null || repoName.isEmpty()) {
@@ -130,7 +125,21 @@ public class ProblemService {
         }
     }
 
-    // 마크다운 생성 및 푸시 공통 메서드
+    // 복습 완료 처리
+    @Transactional
+    public void completeReview(String providerId, Long problemId) {
+        User user = getUserByProviderId(providerId);
+        Problem problem = problemRepository.findById(problemId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 문제를 찾을 수 없습니다. ID=" + problemId));
+
+        if (!problem.getUser().getId().equals(user.getId())) {
+            throw new IllegalArgumentException("권한이 없습니다.");
+        }
+
+        problem.completeReview();
+    }
+
+    // 마크다운 생성 및 푸시
     private void pushProblemToGithub(User user, Problem problem, String commitMessage) {
         String repoName = user.getGithubRepoName();
         if (repoName == null || repoName.isEmpty()) {
@@ -152,10 +161,9 @@ public class ProblemService {
         try {
             githubSyncService.pushToGithub(user.getGithubToken(), user.getNickname(), repoName, path, contentBuilder.toString(), commitMessage);
             String githubUrl = "https://github.com/" + user.getNickname() + "/" + repoName + "/blob/main/" + path;
-            problem.markAsPushed(githubUrl); // 상태 변경
+            problem.markAsPushed(githubUrl);
         } catch (Exception e) {
             log.error("GitHub 푸시 실패", e);
-            // 푸시 실패해도 문제 저장은 성공하도록 예외를 던지지 않고 무시하거나 비동기 처리 가능
         }
     }
 }
